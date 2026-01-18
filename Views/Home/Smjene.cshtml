@@ -1,0 +1,60 @@
+﻿@model IEnumerable<TroskoviRada.Models.Smjena>
+@{
+    ViewData["Title"] = "Smjene";
+}
+
+<h1 class="main-header">SMJENE</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajSmjenu" class="btn btn-primary">DODAJ</a>
+    </div>
+    <div class="col-md-6"></div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Naziv smjene</th>
+                    <th>Vrijeme početka</th>
+                    <th>Vrijeme završetka</th>
+                    <th>Koeficijent plaćanja</th>
+                    <th>Trajanje (sati)</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdSmjena</td>
+                        <td>@item.NazivSmjene</td>
+                        <td>@item.VrijemePocetka.ToString(@"hh\:mm")</td>
+                        <td>@item.VrijemeZavrsetka.ToString(@"hh\:mm")</td>
+                        <td>@item.KoeficijentPlacanja.ToString("0.00")</td>
+                        <td>
+                            @{
+                                var trajanje = item.VrijemeZavrsetka > item.VrijemePocetka
+                                ? (item.VrijemeZavrsetka - item.VrijemePocetka).TotalHours
+                                : (item.VrijemeZavrsetka + TimeSpan.FromHours(24) - item.VrijemePocetka).TotalHours;
+                            }
+                            @trajanje.ToString("0.00") h
+                        </td>
+                        <td>
+                            <a asp-action="UrediSmjenu" asp-route-id="@item.IdSmjena"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiSmjenu" asp-route-id="@item.IdSmjena"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o smjenama.
+    </div>
+}

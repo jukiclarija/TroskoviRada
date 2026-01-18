@@ -1,0 +1,55 @@
+﻿@model IEnumerable<TroskoviRada.Models.Zaposlenik>
+@{
+    ViewData["Title"] = "Zaposlenici";
+}
+
+<h1 class="main-header">ZAPOSLENICI</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajZaposlenika" class="btn btn-primary">DODAJ</a>
+    </div>
+    <div class="col-md-6"></div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ime</th>
+                    <th>Prezime</th>
+                    <th>OIB</th>
+                    <th>Email</th>
+                    <th>Telefon</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdZaposlenik</td>
+                        <td>@item.Ime</td>
+                        <td>@item.Prezime</td>
+                        <td>@item.Oib</td>
+                        <td>@item.Email</td>
+                        <td>@item.Telefon</td>
+                        <td>
+                            <a asp-action="UrediZaposlenika" asp-route-id="@item.IdZaposlenik"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiZaposlenika" asp-route-id="@item.IdZaposlenik"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                        </td>
+                        <td>
+                           
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o zaposlenicima.
+    </div>
+}

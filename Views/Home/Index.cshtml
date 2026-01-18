@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Početna";
+}
+
+<h1 class="main-header">POČETNA STRANICA</h1>
+
+<h2 class="sub-header">Pregled statistike</h2>
+
+@if (ViewBag.Error != null) {
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <p class="stat-number">@(ViewBag.Statistika?.BrojZaposlenika ?? 0)</p>
+            <p class="stat-label">Ukupno zaposlenika</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <p class="stat-number">@(ViewBag.Statistika?.BrojRadnihMjesta ?? 0)</p>
+            <p class="stat-label">Radna mjesta</p>
+        </div>
+    </div>
+
+
+<hr>

@@ -1,0 +1,49 @@
+﻿@model IEnumerable<TroskoviRada.Models.TipNaknade>
+@{
+    ViewData["Title"] = "Naknade";
+}
+
+<h1 class="main-header">NAKNADE</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajNaknadu" class="btn btn-primary">DODAJ</a>
+    </div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Naziv</th>
+                    <th>Iznos</th>
+                    <th>Je postotak</th>
+                    <th>Opis</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdTipNaknade</td>
+                        <td>@item.Naziv</td>
+                        <td>@item.Iznos.ToString("0.00")</td>
+                        <td>@item.Opis</td>
+                        <td>
+                            <a asp-action="UrediNaknadu" asp-route-id="@item.IdTipNaknade"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiNaknadu" asp-route-id="@item.IdTipNaknade"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o naknadama.
+    </div>
+}

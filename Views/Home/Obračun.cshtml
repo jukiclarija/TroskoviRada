@@ -1,0 +1,68 @@
+﻿@model IEnumerable<TroskoviRada.Models.Obračun>
+@{
+    ViewData["Title"] = "Obračun";
+}
+
+<h1 class="main-header">OBRAČUN</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajObračun" class="btn btn-primary">DODAJ</a>
+    </div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Zaposlenik</th>
+                    <th>Mjesec/Godina</th>
+                    <th>Osnovica</th>
+                    <th>Ukupne naknade</th>
+                    <th>Neto plaća</th>
+                    <th>Porez</th>
+                    <th>Bruto plaća</th>
+                    <th>Datum obračuna</th>
+                    <th>Isplaćeno</th>
+                    <th>Napomene</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdObračun</td>
+                        <td>@item.Zaposlenik?.Prezime @item.Zaposlenik?.Ime</td>
+                        <td>@item.Mjesec/@item.Godina</td>
+                        <td>@item.Osnovica.ToString("0.00")</td>
+                        <td>@item.UkupneNaknade.ToString("0.00")</td>
+                        <td>@item.NetoPlaca.ToString("0.00")</td>
+                        <td>@item.Porez.ToString("0.00")</td>
+                        <td>@item.BrutoPlaca.ToString("0.00")</td>
+                        <td>@item.DatumObračuna.ToString("dd.MM.yyyy")</td>
+                        <td>@(item.Isplaceno ? "Da" : "Ne")</td>
+                        <td>@item.Napomene</td>
+                        <td>
+                            <a asp-action="UrediObračun" asp-route-id="@item.IdObračun"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiObračun" asp-route-id="@item.IdObračun"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                            @if (!item.Isplaceno) {
+                                <form asp-action="OznaciIsplaceno" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@item.IdObračun" />
+                                    <button type="submit" class="btn btn-sm btn-success">Označi isplaćeno</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o obračunima.
+    </div>
+}

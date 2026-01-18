@@ -1,0 +1,46 @@
+﻿@model TroskoviRada.Models.Smjena
+@{
+    ViewData["Title"] = "Izbriši smjenu";
+}
+
+<h1 class="main-header">IZBRIŠI SMJENU</h1>
+
+<div class="alert alert-warning">
+    <h4>Jeste li sigurni da želite izbrisati ovu smjenu?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            Naziv smjene
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.NazivSmjene)
+        </dd>
+
+        <dt class="col-sm-3">
+            Vrijeme početka
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.VrijemePocetka)
+        </dd>
+
+        <dt class="col-sm-3">
+            Vrijeme završetka
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.VrijemeZavrsetka)
+        </dd>
+
+        <dt class="col-sm-3">
+            Koeficijent plaćanja
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.KoeficijentPlacanja)
+        </dd>
+    </dl>
+
+    <form asp-action="IzbrisiSmjenu">
+        <input type="hidden" asp-for="IdSmjena" />
+        <input type="submit" value="Izbriši" class="btn btn-danger" />
+        <a asp-action="Smjene" class="btn btn-secondary">Odustani</a>
+    </form>
+</div>

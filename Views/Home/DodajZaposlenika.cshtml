@@ -1,0 +1,369 @@
+﻿@model TroskoviRada.Models.ZaposlenikViewModel
+
+@{
+    ViewData["Title"] = "Dodaj Zaposlenika";
+}
+
+<h1>Dodaj Zaposlenika</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="DodajZaposlenika" id="zaposlenikForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- OSNOVNI PODACI -->
+            <h5>Osnovni podaci</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Ime" class="control-label">Ime *</label>
+                        <input asp-for="Ime" class="form-control" required />
+                        <span asp-validation-for="Ime" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Prezime" class="control-label">Prezime *</label>
+                        <input asp-for="Prezime" class="form-control" required />
+                        <span asp-validation-for="Prezime" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Oib" class="control-label">OIB</label>
+                        <input asp-for="Oib" class="form-control" maxlength="11" />
+                        <span asp-validation-for="Oib" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Telefon" class="control-label">Telefon</label>
+                        <input asp-for="Telefon" class="form-control" />
+                        <span asp-validation-for="Telefon" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="control-label">Email</label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BrojRacuna" class="control-label">Broj računa</label>
+                <input asp-for="BrojRacuna" class="form-control" maxlength="21" />
+                <span asp-validation-for="BrojRacuna" class="text-danger"></span>
+            </div>
+
+            <!-- RADNO MJESTO -->
+            <hr />
+            <h5>Radno mjesto</h5>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Radno mjesto je obavezno za izračun plaće.
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="RadnoMjestoId" class="control-label">Radno mjesto *</label>
+                        <select asp-for="RadnoMjestoId" class="form-control" required>
+                            <option value="">-- Odaberi radno mjesto --</option>
+                            @if (ViewBag.RadnaMjesta != null) {
+                                foreach (var rm in ViewBag.RadnaMjesta) {
+                                    <option value="@rm.IdRadnoMjesto">@rm.Naziv (@rm.Satnica.ToString("C")/h)</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="RadnoMjestoId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="DatumPocetka" class="control-label">Datum početka rada *</label>
+                        <input asp-for="DatumPocetka" class="form-control" type="date" required />
+                        <span asp-validation-for="DatumPocetka" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            @if (ViewBag.RadnaMjesta == null) {
+                <div class="alert alert-warning">
+                    <strong>Upozorenje:</strong> ViewBag.RadnaMjesta je null!
+                </div>
+            } else if (ViewBag.RadnaMjesta.Count == 0) {
+                <div class="alert alert-warning">
+                    <strong>Upozorenje:</strong> Nema radnih mjesta u bazi!
+                </div>
+            }
+
+            <!-- Isto za naknade: -->
+            @if (ViewBag.TipoviNaknada == null) {
+                <div class="alert alert-warning">
+                    <strong>Upozorenje:</strong> ViewBag.TipoviNaknada je null!
+                </div>
+            } else if (ViewBag.TipoviNaknada.Count == 0) {
+                <div class="alert alert-warning">
+                    <strong>Upozorenje:</strong> Nema tipova naknada u bazi!
+                </div>
+            }
+
+            <!-- NAKNADE - DINAMIČKO DODAVANJE -->
+            <hr />
+            <h5>Naknade</h5>
+            <div class="alert alert-info">
+                <i class="fas fa-money-bill-wave"></i>
+                Dodajte naknade koje zaposlenik prima (opcionalno).
+            </div>
+
+            <div id="naknadeContainer">
+                <!-- Prva naknada -->
+                <div class="naknada-item card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Naknada</label>
+                                    <select name="Naknade[0].TipNaknadeId" class="form-control tip-naknade-select">
+                                        <option value="">-- Odaberi naknadu --</option>
+                                        @if (ViewBag.TipoviNaknada != null) {
+                                            foreach (var tn in ViewBag.TipoviNaknada) {
+                                                <option value="@tn.IdTipNaknade" data-je-postotak="@tn.JePostotak" data-iznos="@tn.Iznos">
+                                                    @tn.Naziv - @tn.Iznos.ToString("C")
+                                                    @if (tn.JePostotak) {
+                                                        <span>(@tn.Iznos%)</span>
+                                                    }
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Datum početka</label>
+                                    <input type="date" name="Naknade[0].Datum"
+                                           class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="control-label">&nbsp;</label>
+                                    <button type="button" class="btn btn-danger btn-block remove-naknada" style="display: none;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="naknada-info small text-muted mt-2" style="display: none;">
+                            <!-- Ovdje će se prikazati detalji o naknadi -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gumb za dodavanje nove naknade -->
+            <div class="form-group">
+                <button type="button" id="dodajNaknaduBtn" class="btn btn-outline-primary">
+                    <i class="fas fa-plus"></i> Dodaj još naknadu
+                </button>
+            </div>
+
+            <!-- GUMBI -->
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Dodaj zaposlenika
+                </button>
+                <a asp-action="Zaposlenici" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Odustani
+                </a>
+            </div>
+        </form>
+    </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let naknadaCounter = 0;
+            const naknadeContainer = document.getElementById('naknadeContainer');
+            const dodajNaknaduBtn = document.getElementById('dodajNaknaduBtn');
+            const odabraneNaknadeList = document.getElementById('odabraneNaknadeList');
+
+            // Funkcija za ažuriranje prikaza odabranih naknada
+            function azurirajPrikazOdabranihNaknada() {
+                const odabrane = [];
+                document.querySelectorAll('.tip-naknade-select').forEach((select, index) => {
+                    if (select.value) {
+                        const selectedOption = select.options[select.selectedIndex];
+                        const naziv = selectedOption.text.split(' - ')[0];
+                        odabrane.push({
+                            index: index,
+                            naziv: naziv,
+                            iznos: selectedOption.getAttribute('data-iznos'),
+                            jePostotak: selectedOption.getAttribute('data-je-postotak') === 'True'
+                        });
+                    }
+                });
+
+                if (odabrane.length === 0) {
+                    odabraneNaknadeList.innerHTML = '<li class="text-muted">Nema odabranih naknada</li>';
+                } else {
+                    let html = '';
+                    odabrane.forEach(item => {
+                        const tip = item.jePostotak ? `(${item.iznos}%)` : `(${parseFloat(item.iznos).toFixed(2)}€)`;
+                        html += `<li class="mb-2">
+                            <i class="fas fa-check text-success mr-2"></i>
+                            <strong>${item.naziv}</strong> <span class="text-muted">${tip}</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-sm ml-2 remove-naknada-by-index" data-index="${item.index}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </li>`;
+                    });
+                    odabraneNaknadeList.innerHTML = html;
+
+                    // Dodaj event listener za gumbove za brisanje
+                    document.querySelectorAll('.remove-naknada-by-index').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const index = this.getAttribute('data-index');
+                            const naknadaItem = document.querySelector(`.naknada-item:nth-child(${parseInt(index) + 1})`);
+                            if (naknadaItem) {
+                                naknadaItem.remove();
+                                azurirajIndekse();
+                                azurirajPrikazOdabranihNaknada();
+                            }
+                        });
+                    });
+                }
+            }
+
+            // Funkcija za dodavanje nove naknade
+            function dodajNovuNaknadu() {
+                naknadaCounter++;
+                const noviHtml = `
+                    <div class="naknada-item card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Naknada</label>
+                                        <select name="Naknade[${naknadaCounter}].TipNaknadeId" class="form-control tip-naknade-select">
+                                            <option value="">-- Odaberi naknadu --</option>
+                                            @if (ViewBag.TipoviNaknada != null) {
+                                                    foreach (var tn in ViewBag.TipoviNaknada) {
+                                                            <option value="@tn.IdTipNaknade" data-je-postotak="@tn.JePostotak" data-iznos="@tn.Iznos">
+                                                                @tn.Naziv - @tn.Iznos.ToString("C")
+                                                                @if (tn.JePostotak) {
+                                                                        <span>(@tn.Iznos%)</span>
+                                                                }
+                                                            </option>
+                                                    }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Datum početka</label>
+                                        <input type="date" name="Naknade[${naknadaCounter}].Datum"
+                                               class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="control-label">&nbsp;</label>
+                                        <button type="button" class="btn btn-danger btn-block remove-naknada">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="naknada-info small text-muted mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                `;
+
+                naknadeContainer.insertAdjacentHTML('beforeend', noviHtml);
+
+                // Dodaj event listener za novi select
+                const noviSelect = naknadeContainer.lastElementChild.querySelector('.tip-naknade-select');
+                noviSelect.addEventListener('change', function() {
+                    azurirajPrikazOdabranihNaknada();
+                });
+
+                // Dodaj event listener za gumb za brisanje
+                const removeBtn = naknadeContainer.lastElementChild.querySelector('.remove-naknada');
+                removeBtn.addEventListener('click', function() {
+                    this.closest('.naknada-item').remove();
+                    azurirajIndekse();
+                    azurirajPrikazOdabranihNaknada();
+                });
+
+                azurirajIndekse();
+            }
+
+            // Funkcija za ažuriranje indeksa naknada
+            function azurirajIndekse() {
+                let newIndex = 0;
+                document.querySelectorAll('.naknada-item').forEach((item, index) => {
+                    // Ažuriraj imena inputa
+                    const select = item.querySelector('.tip-naknade-select');
+                    const datumInput = item.querySelector('input[type="date"]');
+
+                    select.name = `Naknade[${newIndex}].TipNaknadeId`;
+                    datumInput.name = `Naknade[${newIndex}].Datum`;
+
+                    // Ažuriraj data-index za gumbove za brisanje u pregledu
+                    const removeBtn = item.querySelector('.remove-naknada');
+                    if (removeBtn) {
+                        removeBtn.setAttribute('data-index', newIndex);
+                    }
+
+                    newIndex++;
+                });
+
+                // Prikaži/sakrij gumbove za brisanje
+                const removeButtons = document.querySelectorAll('.remove-naknada');
+                if (removeButtons.length > 1) {
+                    removeButtons.forEach(btn => btn.style.display = 'block');
+                } else {
+                    removeButtons.forEach(btn => btn.style.display = 'none');
+                }
+
+                naknadaCounter = newIndex - 1;
+            }
+
+            // Event listener za dodavanje nove naknade
+            dodajNaknaduBtn.addEventListener('click', dodajNovuNaknadu);
+
+            // Event listener za promjenu odabira naknade
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('tip-naknade-select')) {
+                    azurirajPrikazOdabranihNaknada();
+                }
+            });
+
+            // Inicijalno sakrij prvi gumb za brisanje
+            const firstRemoveBtn = document.querySelector('.remove-naknada');
+            if (firstRemoveBtn) {
+                firstRemoveBtn.style.display = 'none';
+            }
+
+            // Inicijalno postavi event listener za prvi select
+            const firstSelect = document.querySelector('.tip-naknade-select');
+            if (firstSelect) {
+                firstSelect.addEventListener('change', function() {
+                    azurirajPrikazOdabranihNaknada();
+                });
+            }
+        });
+    </script>
+}

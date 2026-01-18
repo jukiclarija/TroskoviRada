@@ -1,0 +1,66 @@
+﻿@model TroskoviRada.Models.Prisustvo
+@{
+    ViewData["Title"] = "Izbriši prisustvo";
+}
+
+<h1 class="text-danger">Izbriši prisustvo</h1>
+<hr />
+
+<h3>Jeste li sigurni da želite izbrisati ovo prisustvo?</h3>
+
+<div class="alert alert-warning">
+    <h5><i class="fas fa-exclamation-triangle"></i> Upozorenje!</h5>
+    <p>Ova radnja je trajna i ne može se poništiti.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Zaposlenik:</dt>
+            <dd class="col-sm-8">
+                @if (Model.Zaposlenik != null) {
+                    @Model.Zaposlenik.Prezime @Model.Zaposlenik.Ime
+                } else {
+                    <span class="text-muted">Nepoznato</span>
+                }
+            </dd>
+
+            <dt class="col-sm-4">Datum:</dt>
+            <dd class="col-sm-8">@Model.Datum.ToString("dd.MM.yyyy.")</dd>
+
+            <dt class="col-sm-4">Vrijeme:</dt>
+            <dd class="col-sm-8">@Model.VrijemeDolaska.ToString(@"hh\:mm") - @Model.VrijemeOdlaska.ToString(@"hh\:mm")</dd>
+
+            <dt class="col-sm-4">Ukupno sati:</dt>
+            <dd class="col-sm-8">@Model.UkupnoOdradeno.ToString("F2") h</dd>
+
+            <dt class="col-sm-4">Smjena:</dt>
+            <dd class="col-sm-8">
+                @if (Model.Smjena != null) {
+                    @Model.Smjena.NazivSmjene
+                } else {
+                    <span class="text-muted">Nije određena</span>
+                }
+            </dd>
+
+            @if (!string.IsNullOrEmpty(Model.Napomena)) {
+                <dt class="col-sm-4">Napomena:</dt>
+                <dd class="col-sm-8">@Model.Napomena</dd>
+            }
+        </dl>
+
+        <form asp-action="IzbrisiPrisustvo" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IdPrisustvo" />
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> DA, izbriši
+                </button>
+                <a asp-action="Prisustva" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Odustani
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

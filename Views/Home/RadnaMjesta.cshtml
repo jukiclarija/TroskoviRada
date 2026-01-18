@@ -1,0 +1,48 @@
+﻿@model IEnumerable<TroskoviRada.Models.RadnoMjesto>
+@{
+    ViewData["Title"] = "Radna mjesta";
+}
+
+<h1 class="main-header">RADNA MJESTA</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajRadnoMjesto" class="btn btn-primary">DODAJ</a>
+    </div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Naziv</th>
+                    <th>Satnica</th>
+                    <th>Opis</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdRadnoMjesto</td>
+                        <td>@item.Naziv</td>
+                        <td>@item.Satnica.ToString("0.00") €</td>
+                        <td>@item.Opis</td>
+                        <td>
+                            <a asp-action="UrediRadnoMjesto" asp-route-id="@item.IdRadnoMjesto"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiRadnoMjesto" asp-route-id="@item.IdRadnoMjesto"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o radnim mjestima.
+    </div>
+}

@@ -1,0 +1,74 @@
+﻿@model TroskoviRada.Models.Odsustvo
+@{
+    ViewData["Title"] = "Uredi odsustvo";
+    var zaposlenici = ViewBag.Zaposlenici as List<TroskoviRada.Models.Zaposlenik>;
+    var tipoviOdsustva = ViewBag.TipoviOdsustva as List<TroskoviRada.Models.TipOdsustva>;
+}
+
+<h1 class="main-header">UREDI ODSUSTVO</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="UrediOdsustvo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdOdsustvo" />
+
+            <div class="form-group mb-3">
+                <label class="control-label">Zaposlenik</label>
+                <select asp-for="IdZaposlenik" class="form-control" required>
+                    <option value="">-- Odaberite zaposlenika --</option>
+                    @if (zaposlenici != null) {
+                        foreach (var zaposlenik in zaposlenici) {
+                            <option value="@zaposlenik.IdZaposlenik">@zaposlenik.Prezime @zaposlenik.Ime</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="IdZaposlenik" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="control-label">Tip odsustva</label>
+                <select asp-for="IdTipOdsustva" class="form-control" required>
+                    <option value="">-- Odaberite tip odsustva --</option>
+                    @if (tipoviOdsustva != null) {
+                        foreach (var tip in tipoviOdsustva) {
+                            <option value="@tip.IdTipOdsustva">@tip.Naziv</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="IdTipOdsustva" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DatumOd" class="control-label">Datum od</label>
+                <input asp-for="DatumOd" type="date" class="form-control" />
+                <span asp-validation-for="DatumOd" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DatumDo" class="control-label">Datum do</label>
+                <input asp-for="DatumDo" type="date" class="form-control" />
+                <span asp-validation-for="DatumDo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Razlog" class="control-label">Razlog</label>
+                <textarea asp-for="Razlog" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Razlog" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="form-check">
+                    <input asp-for="Odobreno" class="form-check-input" />
+                    <label asp-for="Odobreno" class="form-check-label">Odobreno</label>
+                </div>
+                <span asp-validation-for="Odobreno" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Spremi" class="btn btn-primary" />
+                <a asp-action="Odsustva" class="btn btn-secondary">Odustani</a>
+            </div>
+        </form>
+    </div>
+</div>

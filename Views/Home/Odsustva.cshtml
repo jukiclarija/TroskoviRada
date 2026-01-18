@@ -1,0 +1,54 @@
+﻿@model IEnumerable<TroskoviRada.Models.Odsustvo>
+@{
+    ViewData["Title"] = "Odsustva";
+}
+
+<h1 class="main-header">ODSUSTVA</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajOdsustvo" class="btn btn-primary">DODAJ</a>
+    </div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Zaposlenik</th>
+                    <th>Tip odsustva</th>
+                    <th>Datum od</th>
+                    <th>Datum do</th>
+                    <th>Razlog</th>
+                    <th>Odobreno</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdOdsustvo</td>
+                        <td>@item.Zaposlenik?.Prezime @item.Zaposlenik?.Ime</td>
+                        <td>@item.TipOdsustva?.Naziv</td>
+                        <td>@item.DatumOd.ToString("dd.MM.yyyy")</td>
+                        <td>@item.DatumDo.ToString("dd.MM.yyyy")</td>
+                        <td>@item.Razlog</td>
+                        <td>@(item.Odobreno ? "Da" : "Ne")</td>
+                        <td>
+                            <a asp-action="UrediOdsustvo" asp-route-id="@item.IdOdsustvo"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiOdsustvo" asp-route-id="@item.IdOdsustvo"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o odsustvima.
+    </div>
+}

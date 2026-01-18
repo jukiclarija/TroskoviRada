@@ -1,0 +1,27 @@
+﻿@model TroskoviRada.Models.RadnoMjesto
+@{
+    ViewData["Title"] = "Izbriši radno mjesto";
+}
+
+<h1 class="main-header">IZBRIŠI RADNO MJESTO</h1>
+
+<div class="alert alert-warning">
+    <h4>Jeste li sigurni da želite izbrisati ovo radno mjesto?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Naziv</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Naziv)</dd>
+
+        <dt class="col-sm-3">Satnica</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Satnica) €</dd>
+
+        <dt class="col-sm-3">Opis</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Opis)</dd>
+    </dl>
+
+    <form asp-action="IzbrisiRadnoMjesto" method="post">
+        <input type="hidden" asp-for="IdRadnoMjesto" />
+        <button type="submit" class="btn btn-danger">Izbriši</button>
+        <a asp-action="RadnaMjesta" class="btn btn-secondary">Odustani</a>
+    </form>
+</div>

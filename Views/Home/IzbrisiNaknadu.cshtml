@@ -1,0 +1,30 @@
+﻿@model TroskoviRada.Models.TipNaknade
+@{
+    ViewData["Title"] = "Izbriši naknadu";
+}
+
+<h1 class="main-header">IZBRIŠI NAKNADU</h1>
+
+<div class="alert alert-warning">
+    <h4>Jeste li sigurni da želite izbrisati ovu naknadu?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Naziv</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Naziv)</dd>
+
+        <dt class="col-sm-3">Iznos</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Iznos)</dd>
+
+        <dt class="col-sm-3">Je postotak</dt>
+        <dd class="col-sm-9">@(Model.JePostotak ? "Da" : "Ne")</dd>
+
+        <dt class="col-sm-3">Opis</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Opis)</dd>
+    </dl>
+
+    <form asp-action="IzbrisiNaknadu" method="post">
+        <input type="hidden" asp-for="IdTipNaknade" />
+        <button type="submit" class="btn btn-danger">Izbriši</button>
+        <a asp-action="Naknade" class="btn btn-secondary">Odustani</a>
+    </form>
+</div>

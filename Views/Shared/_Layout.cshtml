@@ -1,0 +1,516 @@
+﻿<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Troškovi Rada</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,165.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+                background-repeat: no-repeat;
+                background-position: bottom;
+                background-size: cover;
+                opacity: 0.3;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+        /* Sidebar s glassmorphism efektom */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 2rem 1.25rem;
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar h1 {
+            color: #ffffff !important;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .sidebar-logo small {
+            display: block;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        /* Navigation links */
+        .sidebar .nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 0.875rem 1.25rem;
+            margin: 0.375rem 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .sidebar .nav-link::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 4px;
+                background: linear-gradient(180deg, #667eea, #764ba2);
+                transform: translateX(-4px);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar .nav-link:hover {
+                background: rgba(255, 255, 255, 0.25);
+                border-color: rgba(255, 255, 255, 0.4);
+                transform: translateX(6px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+                .sidebar .nav-link:hover::before {
+                    transform: translateX(0);
+                }
+
+            .sidebar .nav-link.active {
+                background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2));
+                border-color: rgba(255, 255, 255, 0.5);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+                font-weight: 700;
+            }
+
+                .sidebar .nav-link.active::before {
+                    transform: translateX(0);
+                }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+            .sidebar-footer p {
+                color: rgba(255, 255, 255, 0.75) !important;
+                font-size: 0.8rem;
+                margin: 0.5rem 0;
+                font-weight: 500;
+            }
+
+        /* Main content area s card efektom */
+        .main-content {
+            margin-left: 280px;
+            padding: 2.5rem;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            min-height: calc(100vh - 5rem);
+        }
+
+        /* Headers - ISPRAVLJENO: background-clip */
+        .main-header {
+            font-size: 2.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            margin-bottom: 2rem;
+            text-align: left;
+            letter-spacing: -0.5px;
+        }
+
+        .sub-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #334155;
+            margin: 2rem 0 1.5rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid #e2e8f0;
+            position: relative;
+        }
+
+            .sub-header::after {
+                content: '';
+                position: absolute;
+                bottom: -3px;
+                left: 0;
+                width: 80px;
+                height: 3px;
+                background: linear-gradient(90deg, #667eea, #764ba2);
+            }
+
+        /* Stat cards s gradijentima - ISPRAVLJENO: background-clip */
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+                transform: rotate(45deg);
+                transition: all 0.6s ease;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2);
+                border-color: rgba(102, 126, 234, 0.3);
+            }
+
+                .stat-card:hover::before {
+                    top: -60%;
+                    right: -60%;
+                }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            margin: 0;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Buttons s modernim dizajnom */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px;
+            padding: 0.75rem 1.75rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            }
+
+                .btn-primary:hover::before {
+                    left: 100%;
+                }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px;
+            padding: 0.75rem 1.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.2);
+        }
+
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(100, 116, 139, 0.3);
+            }
+
+        .btn-sm {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.85rem !important;
+        }
+
+        /* Forms */
+        .form-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            margin: 1.5rem 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            background-color: white;
+            color: #1e293b;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+                outline: none;
+                background-color: white;
+            }
+
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Tables */
+        .table-responsive {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table {
+            margin-bottom: 0;
+            font-size: 0.925rem;
+        }
+
+            .table thead th {
+                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                color: #1e293b;
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+                padding: 1.25rem 1rem;
+                border-bottom: 2px solid #e2e8f0;
+            }
+
+            .table tbody td {
+                padding: 1rem;
+                vertical-align: middle;
+                border-bottom: 1px solid #f1f5f9;
+                color: #334155;
+                font-weight: 500;
+            }
+
+            .table tbody tr {
+                transition: all 0.2s ease;
+            }
+
+                .table tbody tr:hover {
+                    background-color: #f8f9fa;
+                    transform: scale(1.005);
+                }
+
+        /* Alerts s modernim stilom */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(135deg, #5568d3, #6a4195);
+            }
+
+        
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <h1>TROŠKOVI RADA</h1>
+            <small>SUSTAV ZA EVIDENCIJU</small>
+        </div>
+
+        <nav class="nav flex-column">
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"
+               asp-controller="Home" asp-action="Index">🏠 POČETNA</a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Zaposlenici" ? "active" : "")"
+               asp-controller="Home" asp-action="Zaposlenici">👥 ZAPOSLENICI</a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "RadnaMjesta" ? "active" : "")"
+               asp-controller="Home" asp-action="RadnaMjesta">💼 RADNA MJESTA</a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Naknade" ? "active" : "")"
+               asp-controller="Home" asp-action="Naknade">💰 NAKNADE</a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Prisustva" ? "active" : "")"
+               asp-controller="Home" asp-action="Prisustva">✅ PRISUSTVA</a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Odsustva" ? "active" : "")"
+               asp-controller="Home" asp-action="Odsustva">🏖️ ODSUSTVA</a>
+
+            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Obračun" ? "active" : "")"
+               asp-controller="Home" asp-action="Obračun">📊 OBRAČUN</a>
+        </nav>
+
+     
+    </div>
+
+    <div class="main-content">
+        <div class="content-wrapper">
+            <main role="main">
+                @if (TempData["SuccessMessage"] != null) {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null) {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

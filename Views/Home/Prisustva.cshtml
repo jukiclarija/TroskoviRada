@@ -1,0 +1,70 @@
+﻿@model IEnumerable<TroskoviRada.Models.Prisustvo>
+@{
+    ViewData["Title"] = "Prisustva";
+}
+
+<h1 class="main-header">PRISUSTVA</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-action="DodajPrisustvo" class="btn btn-primary">DODAJ</a>
+    </div>
+</div>
+
+@if (Model.Any()) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Zaposlenik</th>
+                    <th>Datum</th>
+                    <th>Vrijeme dolaska</th>
+                    <th>Vrijeme odlaska</th>
+                    <th>Ukupno odradeno</th>
+                    <th>Smjena</th>
+                    <th>Napomena</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <td>@item.IdPrisustvo</td>
+                        <td>@item.Zaposlenik?.Prezime @item.Zaposlenik?.Ime</td>
+                        <td>@item.Datum.ToString("dd.MM.yyyy")</td>
+                        <td>@item.VrijemeDolaska.ToString(@"hh\:mm")</td>
+                        <td>@item.VrijemeOdlaska.ToString(@"hh\:mm")</td>
+                        <td>@item.UkupnoOdradeno.ToString("0.00") h</td>
+                        <td>
+                            @if (item.Smjena != null) {
+                                <span title="@item.Smjena.VrijemePocetka.ToString(@"hh\:mm")-@item.Smjena.VrijemeZavrsetka.ToString(@"hh\:mm") (koef: @item.Smjena.KoeficijentPlacanja)">
+                                    @item.Smjena.NazivSmjene
+                                </span>
+                            } else {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.Napomena)) {
+                                <span title="@item.Napomena">@(item.Napomena.Length > 20 ? item.Napomena.Substring(0, 20) + "..." : item.Napomena)</span>
+                            } else {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="UrediPrisustvo" asp-route-id="@item.IdPrisustvo"
+                               class="btn btn-sm btn-primary">Uredi</a>
+                            <a asp-action="IzbrisiPrisustvo" asp-route-id="@item.IdPrisustvo"
+                               class="btn btn-sm btn-secondary">Izbriši</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+} else {
+    <div class="alert alert-info">
+        Nema podataka o prisustvima.
+    </div>
+}

@@ -1,0 +1,34 @@
+﻿@model TroskoviRada.Models.Zaposlenik
+@{
+    ViewData["Title"] = "Izbriši zaposlenika";
+}
+
+<h1 class="main-header">IZBRIŠI ZAPOSLENIKA</h1>
+
+<div class="alert alert-warning">
+    <h4>Jeste li sigurni da želite izbrisati ovog zaposlenika?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Ime</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Ime)</dd>
+
+        <dt class="col-sm-3">Prezime</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Prezime)</dd>
+
+        <dt class="col-sm-3">OIB</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Oib)</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+
+        <dt class="col-sm-3">Telefon</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Telefon)</dd>
+    </dl>
+
+    <!-- PROMJENA: koristi asp-action="IzbrisiZaposlenika" jer je POST akcija -->
+    <form asp-action="IzbrisiZaposlenika" method="post">
+        <input type="hidden" asp-for="IdZaposlenik" />
+        <button type="submit" class="btn btn-danger">Izbriši</button>
+        <a asp-action="Zaposlenici" class="btn btn-secondary">Odustani</a>
+    </form>
+</div>

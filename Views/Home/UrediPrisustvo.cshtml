@@ -1,0 +1,144 @@
+﻿@model TroskoviRada.Models.Prisustvo
+@{
+    ViewData["Title"] = "Uredi prisustvo";
+    var zaposlenici = ViewBag.Zaposlenici as List<TroskoviRada.Models.Zaposlenik>;
+}
+
+<h1 class="main-header">UREDI PRISUSTVO</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="UrediPrisustvo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdPrisustvo" />
+            <input type="hidden" asp-for="IdSmjena" id="IdSmjenaHidden" />
+
+            <div class="form-group mb-3">
+                <label class="control-label">Zaposlenik *</label>
+                <select asp-for="IdZaposlenik" class="form-control" required>
+                    <option value="">-- Odaberite zaposlenika --</option>
+                    @if (zaposlenici != null) {
+                        foreach (var zaposlenik in zaposlenici) {
+                            <option value="@zaposlenik.IdZaposlenik">@zaposlenik.Prezime @zaposlenik.Ime</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="IdZaposlenik" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Datum" class="control-label">Datum *</label>
+                <input asp-for="Datum" type="date" class="form-control" required />
+                <span asp-validation-for="Datum" class="text-danger"></span>
+            </div>
+
+            <!-- SMJENA INFO -->
+            <div class="form-group mb-3">
+                <label class="control-label">Smjena</label>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Smjena će se automatski odrediti na temelju vremena dolaska
+                </div>
+                <div class="mt-2">
+                    @if (Model.Smjena != null) {
+                        <small class="text-success">
+                            <strong>Trenutno:</strong> @Model.Smjena.NazivSmjene
+                        </small>
+                    } else {
+                        <small class="text-muted" id="smjenaInfo">Promijenite vrijeme dolaska da bi se smjena automatski odredila</small>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="VrijemeDolaska" class="control-label">Vrijeme dolaska *</label>
+                        <input asp-for="VrijemeDolaska" type="time" class="form-control" required
+                               onchange="odrediSmjenu(this.value)" />
+                        <span asp-validation-for="VrijemeDolaska" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="VrijemeOdlaska" class="control-label">Vrijeme odlaska *</label>
+                        <input asp-for="VrijemeOdlaska" type="time" class="form-control" required />
+                        <span asp-validation-for="VrijemeOdlaska" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="BrojSati" class="control-label">Broj sati (opcionalno)</label>
+                <input asp-for="BrojSati" class="form-control" />
+                <small class="text-muted">Ako ostavite prazno, izračunat će se iz vremena dolaska/odlaska</small>
+                <span asp-validation-for="BrojSati" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Napomena" class="control-label">Napomena</label>
+                <textarea asp-for="Napomena" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Napomena" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Spremi promjene
+                </button>
+                <a asp-action="Prisustva" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Odustani
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function odrediSmjenu(vrijeme) {
+            if (!vrijeme) return;
+
+            const sati = parseInt(vrijeme.split(':')[0]);
+            const minute = parseInt(vrijeme.split(':')[1]);
+            const ukupnoMinuta = sati * 60 + minute;
+
+            let smjenaId = 0;
+
+            // Noćna: 22:00 (1320 min) do 06:00 (360 min)
+            if (ukupnoMinuta >= 1320 || ukupnoMinuta < 360) {
+                smjenaId = 3; // Noćna smjena
+            }
+            // Druga smjena: 14:00 (840 min) do 22:00 (1320 min)
+            else if (ukupnoMinuta >= 840) {
+                smjenaId = 2; // Druga smjena
+            }
+            // Prva smjena: 06:00 (360 min) do 14:00 (840 min)
+            else {
+                smjenaId = 1; // Prva smjena
+            }
+
+            // Postavi hidden field
+            document.getElementById('IdSmjenaHidden').value = smjenaId;
+
+            // Prikaži informaciju
+            const smjeneNazivi = ['', 'Prva smjena', 'Druga smjena', 'Noćna smjena'];
+            const smjenaInfo = document.getElementById('smjenaInfo');
+            if (smjenaInfo) {
+                smjenaInfo.innerHTML = `<strong>Nova smjena:</strong> ${smjeneNazivi[smjenaId]} (automatski određeno)`;
+                smjenaInfo.style.color = '#28a745';
+            }
+        }
+
+        // Inicijalno odredi smjenu ako postoji vrijeme dolaska
+        document.addEventListener('DOMContentLoaded', function() {
+            const vrijemeInput = document.querySelector('input[name="VrijemeDolaska"]');
+            if (vrijemeInput && vrijemeInput.value) {
+                odrediSmjenu(vrijemeInput.value);
+            }
+        });
+    </script>
+}

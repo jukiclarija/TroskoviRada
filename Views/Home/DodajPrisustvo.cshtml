@@ -1,0 +1,316 @@
+﻿@model TroskoviRada.Models.Prisustvo
+@{
+    ViewData["Title"] = "Dodaj Prisustvo";
+}
+
+<h1>Dodaj Prisustvo</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="DodajPrisustvo" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- ZAPOSLENIK -->
+            <div class="form-group">
+                <label asp-for="IdZaposlenik" class="control-label">Zaposlenik *</label>
+                <select asp-for="IdZaposlenik" class="form-control" required>
+                    <option value="">-- Odaberi zaposlenika --</option>
+                    @if (ViewBag.Zaposlenici != null) {
+                        foreach (var zaposlenik in ViewBag.Zaposlenici) {
+                            <option value="@zaposlenik.IdZaposlenik">@zaposlenik.Prezime @zaposlenik.Ime</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="IdZaposlenik" class="text-danger"></span>
+            </div>
+
+            <!-- DATUM -->
+            <div class="form-group">
+                <label asp-for="Datum" class="control-label">Datum rada *</label>
+                <input asp-for="Datum" class="form-control" type="date" required />
+                <span asp-validation-for="Datum" class="text-danger"></span>
+            </div>
+
+            <!-- VRIJEME DOLASKA I ODLAZKA -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="VrijemeDolaska" class="control-label">Vrijeme dolaska *</label>
+                        <input asp-for="VrijemeDolaska" class="form-control" type="time"
+                               value="08:00" required />
+                        <span asp-validation-for="VrijemeDolaska" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="VrijemeOdlaska" class="control-label">Vrijeme odlaska *</label>
+                        <input asp-for="VrijemeOdlaska" class="form-control" type="time"
+                               value="16:00" required />
+                        <span asp-validation-for="VrijemeOdlaska" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUTOMATSKO ODREĐIVANJE SMJENE (SKRIVENO) -->
+            <input type="hidden" asp-for="IdSmjena" id="IdSmjenaHidden" />
+
+            <div class="form-group">
+                <label class="control-label">Određivanje smjene</label>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Smjena će se automatski odrediti</strong> na temelju vremena dolaska:<br>
+                    • <strong>06:00-14:00</strong>: Prva smjena<br>
+                    • <strong>14:00-22:00</strong>: Druga smjena<br>
+                    • <strong>22:00-06:00</strong>: Noćna smjena
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted" id="smjenaInfo">Odredite vrijeme dolaska da bi se smjena automatski odredila</small>
+                </div>
+            </div>
+
+            <!-- AUTOMATSKO RAČUNANJE (samo prikaz) -->
+            <div class="form-group">
+                <label class="control-label">Ukupno odradeno</label>
+                <div class="form-control-plaintext">
+                    <span id="ukupnoSatiPrikaz">8.00</span> sati
+                    <small class="text-muted ml-2">(automatski izračunato)</small>
+                </div>
+                <!-- Hidden field za spremanje u bazu -->
+                <input type="hidden" asp-for="UkupnoOdradeno" id="UkupnoOdradenoHidden" value="8.00" />
+            </div>
+
+            <!-- NAPOMENA -->
+            <div class="form-group">
+                <label asp-for="Napomena" class="control-label">Napomena</label>
+                <textarea asp-for="Napomena" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Napomena" class="text-danger"></span>
+            </div>
+
+            <!-- GUMBI -->
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Spremi prisustvo
+                </button>
+                <a asp-action="Prisustva" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Odustani
+                </a>
+            </div>
+
+            <div class="alert alert-info mt-3">
+                <small>
+                    <i class="fas fa-info-circle"></i>
+                    Polja označena sa * su obavezna. Smjena i ukupno odradeno vrijeme se automatski određuju.
+                </small>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-calculator"></i> Kalkulator radnog vremena</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <h6>Dolazak</h6>
+                        <div class="display-4" id="dolazakVrijeme">08:00</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <h6>Odlazak</h6>
+                        <div class="display-4" id="odlazakVrijeme">16:00</div>
+                    </div>
+                </div>
+                <hr />
+                <div class="text-center">
+                    <h5>Ukupno odradeno:</h5>
+                    <div class="display-3 text-primary" id="ukupnoVrijeme">8:00</div>
+                    <div class="text-muted mt-2" id="ukupnoDecimal">(8.00 sati)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO O SMJENAMA -->
+        <div class="card mt-3">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Informacije o smjenama</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><strong>Prva smjena:</strong> 06:00-14:00 (koef. 1.0)</li>
+                    <li><strong>Druga smjena:</strong> 14:00-22:00 (koef. 1.0)</li>
+                    <li><strong>Noćna smjena:</strong> 22:00-06:00 (koef. 1.5)</li>
+                </ul>
+                <div class="alert alert-warning mt-2">
+                    <small>
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Napomena:</strong> Smjena se automatski određuje na temelju vremena dolaska.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dolazakInput = document.querySelector('input[name="VrijemeDolaska"]');
+            const odlazakInput = document.querySelector('input[name="VrijemeOdlaska"]');
+            const ukupnoHidden = document.getElementById('UkupnoOdradenoHidden');
+            const ukupnoPrikaz = document.getElementById('ukupnoSatiPrikaz');
+            const dolazakPrikaz = document.getElementById('dolazakVrijeme');
+            const odlazakPrikaz = document.getElementById('odlazakVrijeme');
+            const ukupnoVrijemePrikaz = document.getElementById('ukupnoVrijeme');
+            const ukupnoDecimalPrikaz = document.getElementById('ukupnoDecimal');
+            const smjenaHidden = document.getElementById('IdSmjenaHidden');
+            const smjenaInfo = document.getElementById('smjenaInfo');
+
+            // Funkcija za određivanje smjene
+            function odrediSmjenu(vrijeme) {
+                if (!vrijeme) return null;
+
+                const sati = parseInt(vrijeme.split(':')[0]);
+                const minute = parseInt(vrijeme.split(':')[1]);
+                const ukupnoMinuta = sati * 60 + minute;
+
+                // Logika za određivanje smjene:
+                // 06:00-14:00 → Prva smjena
+                // 14:00-22:00 → Druga smjena
+                // 22:00-06:00 → Noćna smjena
+
+                // Noćna: 22:00 (1320 min) do 06:00 (360 min)
+                if (ukupnoMinuta >= 1320 || ukupnoMinuta < 360) {
+                    return 3; // Noćna smjena
+                }
+                // Druga smjena: 14:00 (840 min) do 22:00 (1320 min)
+                else if (ukupnoMinuta >= 840) {
+                    return 2; // Druga smjena
+                }
+                // Prva smjena: 06:00 (360 min) do 14:00 (840 min)
+                else {
+                    return 1; // Prva smjena
+                }
+            }
+
+            // Funkcija za prikaz informacija o smjeni
+            function prikaziInfoOSmjeni(smjenaId) {
+                const smjeneInfo = {
+                    1: { naziv: "Prva smjena", opis: "06:00-14:00 (automatski određeno)" },
+                    2: { naziv: "Druga smjena", opis: "14:00-22:00 (automatski određeno)" },
+                    3: { naziv: "Noćna smjena", opis: "22:00-06:00 (automatski određeno)" }
+                };
+
+                if (smjenaId && smjeneInfo[smjenaId]) {
+                    const info = smjeneInfo[smjenaId];
+                    smjenaInfo.innerHTML = `<strong>${info.naziv}:</strong> ${info.opis}`;
+                    smjenaInfo.style.color = '#28a745';
+                    return info.naziv;
+                } else {
+                    smjenaInfo.innerHTML = 'Unesite vrijeme dolaska da bi se smjena odredila';
+                    smjenaInfo.style.color = '#6c757d';
+                    return null;
+                }
+            }
+
+            // Funkcija za formatiranje vremena
+            function formatirajVrijeme(sati, minute) {
+                return `${sati.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            }
+
+            // Funkcija za izračun ukupnog vremena
+            function izracunajUkupnoVrijeme() {
+                if (!dolazakInput.value || !odlazakInput.value) return;
+
+                const [dolazakSati, dolazakMinute] = dolazakInput.value.split(':').map(Number);
+                const [odlazakSati, odlazakMinute] = odlazakInput.value.split(':').map(Number);
+
+                // Prikaži vrijednosti
+                dolazakPrikaz.textContent = formatirajVrijeme(dolazakSati, dolazakMinute);
+                odlazakPrikaz.textContent = formatirajVrijeme(odlazakSati, odlazakMinute);
+
+                // Izračunaj ukupno
+                let ukupnoSati = odlazakSati - dolazakSati;
+                let ukupnoMinute = odlazakMinute - dolazakMinute;
+
+                // Ako je odlazak sljedeći dan (npr. noćna smjena)
+                if (ukupnoSati < 0 || (ukupnoSati === 0 && ukupnoMinute < 0)) {
+                    ukupnoSati += 24;
+                }
+
+                // Prilagodi minute
+                if (ukupnoMinute < 0) {
+                    ukupnoSati -= 1;
+                    ukupnoMinute += 60;
+                }
+
+                // Decimalni prikaz
+                const ukupnoDecimal = ukupnoSati + (ukupnoMinute / 60);
+
+                // Spremi u hidden field
+                ukupnoHidden.value = ukupnoDecimal.toFixed(2);
+                ukupnoPrikaz.textContent = ukupnoDecimal.toFixed(2);
+
+                // Prikaži u kalkulatoru
+                ukupnoVrijemePrikaz.textContent = formatirajVrijeme(ukupnoSati, ukupnoMinute);
+                ukupnoDecimalPrikaz.textContent = `(${ukupnoDecimal.toFixed(2)} sati)`;
+            }
+
+            // Automatski određi smjenu kada se promijeni vrijeme dolaska
+            dolazakInput.addEventListener('change', function() {
+                if (this.value) {
+                    const smjenaId = odrediSmjenu(this.value);
+                    if (smjenaId) {
+                        smjenaHidden.value = smjenaId;
+                        const smjenaNaziv = prikaziInfoOSmjeni(smjenaId);
+
+                        // Pokaži poruku
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show mt-2';
+                        alertDiv.innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            Automatski određena ${smjenaNaziv}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+
+                        const form = document.querySelector('form');
+                        const existingAlert = form.parentNode.querySelector('.alert-success');
+                        if (existingAlert) existingAlert.remove();
+
+                        form.parentNode.insertBefore(alertDiv, form);
+
+                        setTimeout(() => {
+                            if (alertDiv.parentNode && alertDiv.querySelector('.btn-close')) {
+                                alertDiv.querySelector('.btn-close').click();
+                            }
+                        }, 3000);
+                    }
+                }
+                izracunajUkupnoVrijeme();
+            });
+
+            // Dodaj event listenere
+            odlazakInput.addEventListener('change', izracunajUkupnoVrijeme);
+            odlazakInput.addEventListener('input', izracunajUkupnoVrijeme);
+
+            // Inicijalni izračun
+            izracunajUkupnoVrijeme();
+
+            // Ako već postoji vrijeme, odredi smjenu
+            if (dolazakInput.value) {
+                const smjenaId = odrediSmjenu(dolazakInput.value);
+                if (smjenaId) {
+                    smjenaHidden.value = smjenaId;
+                    prikaziInfoOSmjeni(smjenaId);
+                }
+            }
+        });
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}

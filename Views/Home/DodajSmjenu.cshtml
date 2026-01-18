@@ -1,0 +1,44 @@
+﻿@model TroskoviRada.Models.Smjena
+@{
+    ViewData["Title"] = "Dodaj smjenu";
+}
+
+<h1 class="main-header">DODAJ NOVU SMJENU</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="DodajSmjenu">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NazivSmjene" class="control-label">Naziv smjene</label>
+                <input asp-for="NazivSmjene" class="form-control" />
+                <span asp-validation-for="NazivSmjene" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="VrijemePocetka" class="control-label">Vrijeme početka</label>
+                <input asp-for="VrijemePocetka" type="time" class="form-control" />
+                <span asp-validation-for="VrijemePocetka" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="VrijemeZavrsetka" class="control-label">Vrijeme završetka</label>
+                <input asp-for="VrijemeZavrsetka" type="time" class="form-control" />
+                <span asp-validation-for="VrijemeZavrsetka" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="KoeficijentPlacanja" class="control-label">Koeficijent plaćanja</label>
+                <input asp-for="KoeficijentPlacanja" class="form-control" />
+                <span asp-validation-for="KoeficijentPlacanja" class="text-danger"></span>
+                <small class="form-text text-muted">Primjer: 1.0 = normalno plaćanje, 1.5 = 50% više, 2.0 = duplo plaćanje</small>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Spremi" class="btn btn-primary" />
+                <a asp-action="Smjene" class="btn btn-secondary">Odustani</a>
+            </div>
+        </form>
+    </div>
+</div>

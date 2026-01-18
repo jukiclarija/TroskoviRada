@@ -1,0 +1,36 @@
+﻿@model TroskoviRada.Models.Odsustvo
+@{
+    ViewData["Title"] = "Izbriši odsustvo";
+}
+
+<h1 class="main-header">IZBRIŠI ODSUSTVO</h1>
+
+<div class="alert alert-warning">
+    <h4>Jeste li sigurni da želite izbrisati ovo odsustvo?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Zaposlenik</dt>
+        <dd class="col-sm-9">@Model.Zaposlenik?.Prezime @Model.Zaposlenik?.Ime</dd>
+
+        <dt class="col-sm-3">Tip odsustva</dt>
+        <dd class="col-sm-9">@Model.TipOdsustva?.Naziv</dd>
+
+        <dt class="col-sm-3">Datum od</dt>
+        <dd class="col-sm-9">@Model.DatumOd.ToString("dd.MM.yyyy")</dd>
+
+        <dt class="col-sm-3">Datum do</dt>
+        <dd class="col-sm-9">@Model.DatumDo.ToString("dd.MM.yyyy")</dd>
+
+        <dt class="col-sm-3">Razlog</dt>
+        <dd class="col-sm-9">@Model.Razlog</dd>
+
+        <dt class="col-sm-3">Odobreno</dt>
+        <dd class="col-sm-9">@(Model.Odobreno ? "Da" : "Ne")</dd>
+    </dl>
+
+    <form asp-action="IzbrisiOdsustvo" method="post">
+        <input type="hidden" asp-for="IdOdsustvo" />
+        <button type="submit" class="btn btn-danger">Izbriši</button>
+        <a asp-action="Odsustva" class="btn btn-secondary">Odustani</a>
+    </form>
+</div>

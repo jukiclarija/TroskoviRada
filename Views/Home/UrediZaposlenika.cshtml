@@ -1,0 +1,65 @@
+﻿@model TroskoviRada.Models.Zaposlenik
+@{
+    ViewData["Title"] = "Uredi zaposlenika";
+}
+
+<h1 class="main-header">UREDI ZAPOSLENIKA</h1>
+
+<div class="form-container">
+    <h2 class="sub-header">Uredi zaposlenika</h2>
+
+    <form asp-action="UrediZaposlenika">
+        <input type="hidden" asp-for="IdZaposlenik" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Ime" class="form-label"></label>
+                    <input asp-for="Ime" class="form-control" />
+                    <span asp-validation-for="Ime" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Oib" class="form-label"></label>
+                    <input asp-for="Oib" class="form-control" />
+                    <span asp-validation-for="Oib" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Telefon" class="form-label"></label>
+                    <input asp-for="Telefon" class="form-control" />
+                    <span asp-validation-for="Telefon" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="Prezime" class="form-label"></label>
+                    <input asp-for="Prezime" class="form-control" />
+                    <span asp-validation-for="Prezime" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-primary w-100">SPREMI</button>
+            </div>
+            <div class="col-md-6">
+                <a asp-action="Zaposlenici" class="btn btn-secondary w-100">ODUSTANI</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

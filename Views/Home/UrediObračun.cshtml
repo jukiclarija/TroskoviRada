@@ -1,0 +1,96 @@
+﻿@model TroskoviRada.Models.Obračun
+@{
+    ViewData["Title"] = "Uredi obračun";
+    var zaposlenici = ViewBag.Zaposlenici as List<TroskoviRada.Models.Zaposlenik>;
+}
+
+<h1 class="main-header">UREDI OBRAČUN</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="UrediObračun">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IdObračun" />
+
+            <div class="form-group mb-3">
+                <label class="control-label">Zaposlenik</label>
+                <select asp-for="IdZaposlenik" class="form-control" required>
+                    <option value="">-- Odaberite zaposlenika --</option>
+                    @if (zaposlenici != null) {
+                        foreach (var zaposlenik in zaposlenici) {
+                            <option value="@zaposlenik.IdZaposlenik">@zaposlenik.Prezime @zaposlenik.Ime</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="IdZaposlenik" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Mjesec" class="control-label">Mjesec</label>
+                <input asp-for="Mjesec" class="form-control" />
+                <span asp-validation-for="Mjesec" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Godina" class="control-label">Godina</label>
+                <input asp-for="Godina" class="form-control" />
+                <span asp-validation-for="Godina" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="IznosOsnovice" class="control-label">Iznos osnovice</label>
+                <input asp-for="IznosOsnovice" class="form-control" />
+                <span asp-validation-for="IznosOsnovice" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="UkupneNaknade" class="control-label">Ukupne naknade</label>
+                <input asp-for="UkupneNaknade" class="form-control" />
+                <span asp-validation-for="UkupneNaknade" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="IznosOdsustva" class="control-label">Iznos odsustva</label>
+                <input asp-for="IznosOdsustva" class="form-control" />
+                <span asp-validation-for="IznosOdsustva" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Porez" class="control-label">Porez</label>
+                <input asp-for="Porez" class="form-control" />
+                <span asp-validation-for="Porez" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NetoPlaca" class="control-label">Neto plaća</label>
+                <input asp-for="NetoPlaca" class="form-control" />
+                <span asp-validation-for="NetoPlaca" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="BrutoPlaca" class="control-label">Bruto plaća</label>
+                <input asp-for="BrutoPlaca" class="form-control" />
+                <span asp-validation-for="BrutoPlaca" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Napomene" class="control-label">Napomene</label>
+                <textarea asp-for="Napomene" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Napomene" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="form-check">
+                    <input asp-for="Isplaceno" class="form-check-input" />
+                    <label asp-for="Isplaceno" class="form-check-label">Isplaćeno</label>
+                </div>
+                <span asp-validation-for="Isplaceno" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Spremi" class="btn btn-primary" />
+                <a asp-action="Obračun" class="btn btn-secondary">Odustani</a>
+            </div>
+        </form>
+    </div>
+</div>

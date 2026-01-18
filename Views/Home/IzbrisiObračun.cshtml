@@ -1,0 +1,42 @@
+﻿@model TroskoviRada.Models.Obračun
+@{
+    ViewData["Title"] = "Izbriši obračun";
+}
+
+<h1 class="main-header">IZBRIŠI OBRAČUN</h1>
+
+<div class="alert alert-warning">
+    <h4>Jeste li sigurni da želite izbrisati ovaj obračun?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Zaposlenik</dt>
+        <dd class="col-sm-9">@Model.Zaposlenik?.Prezime @Model.Zaposlenik?.Ime</dd>
+
+        <dt class="col-sm-3">Mjesec/Godina</dt>
+        <dd class="col-sm-9">@Model.Mjesec/@Model.Godina</dd>
+
+        <dt class="col-sm-3">Osnovica</dt>
+        <dd class="col-sm-9">@Model.IznosOsnovice.ToString("0.00")</dd>
+
+        <dt class="col-sm-3">Ukupne naknade</dt>
+        <dd class="col-sm-9">@Model.UkupneNaknade.ToString("0.00")</dd>
+
+        <dt class="col-sm-3">Neto plaća</dt>
+        <dd class="col-sm-9">@Model.NetoPlaca.ToString("0.00")</dd>
+
+        <dt class="col-sm-3">Porez</dt>
+        <dd class="col-sm-9">@Model.Porez.ToString("0.00")</dd>
+
+        <dt class="col-sm-3">Bruto plaća</dt>
+        <dd class="col-sm-9">@Model.BrutoPlaca.ToString("0.00")</dd>
+
+        <dt class="col-sm-3">Isplaćeno</dt>
+        <dd class="col-sm-9">@(Model.Isplaceno ? "Da" : "Ne")</dd>
+    </dl>
+
+    <form asp-action="IzbrisiObračun" method="post">
+        <input type="hidden" asp-for="IdObračun" />
+        <button type="submit" class="btn btn-danger">Izbriši</button>
+        <a asp-action="Obračun" class="btn btn-secondary">Odustani</a>
+    </form>
+</div>

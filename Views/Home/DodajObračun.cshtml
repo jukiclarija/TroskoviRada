@@ -1,0 +1,324 @@
+﻿@model TroskoviRada.Models.Obračun
+
+@{
+    ViewData["Title"] = "Dodaj Obračun";
+}
+
+<h1>Dodaj Obračun</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="DodajObračun" id="obracunForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- ZAPOSLENIK -->
+            <div class="form-group">
+                <label asp-for="IdZaposlenik" class="control-label">Zaposlenik *</label>
+                <select asp-for="IdZaposlenik" class="form-control"
+                        asp-items="@(new SelectList(ViewBag.Zaposlenici, "IdZaposlenik", "PunoIme"))"
+                        id="zaposlenikSelect" required>
+                    <option value="">-- Odaberi zaposlenika --</option>
+                </select>
+                <span asp-validation-for="IdZaposlenik" class="text-danger"></span>
+            </div>
+
+            <!-- MJESEC I GODINA -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Mjesec" class="control-label">Mjesec *</label>
+                        <select asp-for="Mjesec" class="form-control" id="mjesecSelect" required>
+                            <option value="">-- Odaberi mjesec --</option>
+                            @for (int i = 1; i <= 12; i++) {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Mjesec" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Godina" class="control-label">Godina *</label>
+                        <input asp-for="Godina" class="form-control" type="number"
+                               min="2000" max="2100" value="@DateTime.Now.Year"
+                               id="godinaInput" required />
+                        <span asp-validation-for="Godina" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+            <h5>Automatski izračun</h5>
+            <div class="alert alert-info">
+                <button type="button" class="btn btn-sm btn-outline-primary mb-2"
+                        id="autoIzracunBtn">
+                    <i class="fas fa-calculator"></i> Automatski izračunaj
+                </button>
+                <p class="mb-0">Kliknite za automatski izračun na temelju prisustva i odsustva.</p>
+
+                <!-- DEBUG DIV - možete obrisati kasnije -->
+                <div class="alert alert-warning mt-3" id="debugInfo" style="display: none;">
+                    <h6>Debug informacije:</h6>
+                    <div id="debugContent"></div>
+                </div>
+            </div>
+
+            <!-- OSNOVICA -->
+            <div class="form-group">
+                <label asp-for="Osnovica" class="control-label">Osnovica (odrađeni sati × satnica)</label>
+                <div class="input-group">
+                    <input asp-for="Osnovica" class="form-control" type="number" step="0.01" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <span asp-validation-for="Osnovica" class="text-danger"></span>
+            </div>
+
+            <!-- NAKNADE -->
+            <div class="form-group">
+                <label asp-for="UkupneNaknade" class="control-label">Ukupne naknade</label>
+                <div class="input-group">
+                    <input asp-for="UkupneNaknade" class="form-control" type="number" step="0.01" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <span asp-validation-for="UkupneNaknade" class="text-danger"></span>
+            </div>
+
+            <!-- BRUTO PLAĆA -->
+            <div class="form-group">
+                <label asp-for="BrutoPlaca" class="control-label">Bruto plaća</label>
+                <div class="input-group">
+                    <input asp-for="BrutoPlaca" class="form-control" type="number" step="0.01" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <small class="form-text text-muted">Osnovica + Naknade - Odsustva</small>
+                <span asp-validation-for="BrutoPlaca" class="text-danger"></span>
+            </div>
+
+            <!-- POREZ -->
+            <div class="form-group">
+                <label asp-for="Porez" class="control-label">Porez (25%)</label>
+                <div class="input-group">
+                    <input asp-for="Porez" class="form-control" type="number" step="0.01" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <span asp-validation-for="Porez" class="text-danger"></span>
+            </div>
+
+            <!-- NETO PLAĆA -->
+            <div class="form-group">
+                <label asp-for="NetoPlaca" class="control-label">Neto plaća (za isplatu)</label>
+                <div class="input-group">
+                    <input asp-for="NetoPlaca" class="form-control" type="number" step="0.01" />
+                    <div class="input-group-append">
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <small class="form-text text-muted">Bruto plaća - Porez</small>
+                <span asp-validation-for="NetoPlaca" class="text-danger"></span>
+            </div>
+
+            <!-- NAPOMENE -->
+            <div class="form-group">
+                <label asp-for="Napomene" class="control-label">Napomene</label>
+                <textarea asp-for="Napomene" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Napomene" class="text-danger"></span>
+            </div>
+
+            <!-- GUMBI -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Spremi obračun
+                </button>
+                <a asp-action="Obračun" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Natrag na listu
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informacije</h5>
+            </div>
+            <div class="card-body">
+                <h6>Kako funkcionira automatski obračun:</h6>
+                <ul>
+                    <li><strong>Osnovica:</strong> Ukupno odrađeni sati × satnica radnog mjesta</li>
+                    <li><strong>Naknade:</strong> Dnevne naknade za svaki dan prisustva</li>
+                    <li><strong>Odsustva:</strong> Oduzimaju se prema koeficijentu isplate</li>
+                    <li><strong>Bruto:</strong> Osnovica + Naknade - Odsustva</li>
+                    <li><strong>Porez:</strong> 25% od bruto plaće</li>
+                    <li><strong>Neto:</strong> Bruto plaća - Porez</li>
+                </ul>
+                <div class="alert alert-warning">
+                    <small>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Sve vrijednosti možete ručno urediti ako je potrebno.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            console.log('=== DEBUG MODE AKTIVIRAN ===');
+
+            // Gumb za automatski izračun
+            $('#autoIzracunBtn').click(function () {
+                console.log('=== AUTO IZRAČUN KLIKNUTO ===');
+                
+                // 1. SVIM NAČINIMA DOHVAĆANJA VRIJEDNOSTI
+                console.log('Način 1 - Po ID:');
+                console.log('IdZaposlenik:', $('#IdZaposlenik').val());
+                console.log('Mjesec:', $('#Mjesec').val());
+                console.log('Godina:', $('#Godina').val());
+                
+                console.log('Način 2 - Po name:');
+                console.log('IdZaposlenik name:', $('[name="IdZaposlenik"]').val());
+                console.log('Mjesec name:', $('[name="Mjesec"]').val());
+                console.log('Godina name:', $('[name="Godina"]').val());
+                
+                console.log('Način 3 - Po asp-for:');
+                console.log('asp-for IdZaposlenik:', $('select[data-val="true"]').first().val());
+                
+                console.log('Način 4 - Direktno DOM:');
+                var selectZaposlenik = document.getElementById('IdZaposlenik');
+                console.log('DOM IdZaposlenik:', selectZaposlenik ? selectZaposlenik.value : 'NEMA ELEMENTA');
+                
+                // 2. POKUŠAJTE SA SVAKOM VARIJABLOM
+                var zaposlenikId = $('#IdZaposlenik').val() || 
+                                   $('[name="IdZaposlenik"]').val() || 
+                                   $('select[asp-for="IdZaposlenik"]').val();
+                
+                var mjesec = $('#Mjesec').val() || 
+                             $('[name="Mjesec"]').val();
+                             
+                var godina = $('#Godina').val() || 
+                             $('[name="Godina"]').val();
+                
+                console.log('Finalne vrijednosti:');
+                console.log('zaposlenikId:', zaposlenikId);
+                console.log('mjesec:', mjesec);
+                console.log('godina:', godina);
+                
+                // 3. PROVJERITE DA LI SU PRAZNI ILI "0"
+                if (!zaposlenikId || zaposlenikId === '' || zaposlenikId === '0') {
+                    console.log('GREŠKA: zaposlenikId je prazan');
+                    // Ručno prikaži sve opcije u selectu
+                    console.log('Sve opcije u selectu:');
+                    $('#IdZaposlenik option').each(function() {
+                        console.log('Option value:', $(this).val(), 'text:', $(this).text());
+                    });
+                }
+                
+                if (!mjesec || mjesec === '' || mjesec === '0') {
+                    console.log('GREŠKA: mjesec je prazan');
+                }
+                
+                if (!godina || godina === '' || godina === '0') {
+                    console.log('GREŠKA: godina je prazan');
+                }
+
+                // 4. AKO SVE IMA VRUJEDNOST, POZOVI AJAX
+                if (zaposlenikId && mjesec && godina && 
+                    zaposlenikId !== '' && mjesec !== '' && godina !== '' &&
+                    zaposlenikId !== '0' && mjesec !== '0' && godina !== '0') {
+                    
+                    console.log('Sve OK, pozivam automatskiIzracunajPlacu...');
+                    automatskiIzracunajPlacu(zaposlenikId, mjesec, godina);
+                } else {
+                    alert('Molimo odaberite zaposlenika, mjesec i godinu prije automatskog izračuna!\n\n' +
+                          'Zaposlenik: ' + (zaposlenikId || 'Nije odabran') + '\n' +
+                          'Mjesec: ' + (mjesec || 'Nije odabran') + '\n' +
+                          'Godina: ' + (godina || 'Nije odabran') + 
+                          '\n\nProvjerite konzolu za detalje (F12 → Console)');
+                }
+            });
+
+            function automatskiIzracunajPlacu(zaposlenikId, mjesec, godina) {
+                console.log('=== POZIVANJE SERVERA ===');
+                console.log('Parametri:', { zaposlenikId, mjesec, godina });
+
+                // Prikaži loading indikator
+                $('#autoIzracunBtn').html('<i class="fas fa-spinner fa-spin"></i> Izračunavam...');
+                $('#autoIzracunBtn').prop('disabled', true);
+
+                // AJAX poziv
+                $.ajax({
+                    url: '/Home/AutoIzracunajPlacu',
+                    type: 'GET',
+                    data: {
+                        zaposlenikId: zaposlenikId,
+                        mjesec: mjesec,
+                        godina: godina
+                    },
+                    success: function (data) {
+                        console.log('Odgovor od servera:', data);
+                        
+                        if (data.success) {
+                            // Popuni polja - probaj sve načine
+                            $('#Osnovica').val(data.osnovica.toFixed(2));
+                            $('#UkupneNaknade').val(data.ukupneNaknade.toFixed(2));
+                            $('#BrutoPlaca').val(data.brutoPlaca.toFixed(2));
+                            $('#Porez').val(data.porez.toFixed(2));
+                            $('#NetoPlaca').val(data.netoPlaca.toFixed(2));
+                            
+                            // Ako ne radi po ID, probaj po name
+                            if (!$('#Osnovica').val()) {
+                                $('[name="Osnovica"]').val(data.osnovica.toFixed(2));
+                            }
+                            
+                            // Popuni napomene
+                            if ($('#Napomene').length) {
+                                $('#Napomene').val(data.napomene || '');
+                            }
+                            
+                            alert('✅ Plaća uspješno izračunata!\n\n' +
+                                  'Osnovica: ' + data.osnovica.toFixed(2) + '€\n' +
+                                  'Naknade: ' + data.ukupneNaknade.toFixed(2) + '€\n' +
+                                  'Bruto: ' + data.brutoPlaca.toFixed(2) + '€\n' +
+                                  'Porez: ' + data.porez.toFixed(2) + '€\n' +
+                                  'Neto: ' + data.netoPlaca.toFixed(2) + '€');
+                        } else {
+                            alert('❌ Greška pri izračunu: ' + data.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX error:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        
+                        alert('❌ Došlo je do greške pri komunikaciji sa serverom.\n' +
+                              'Provjerite da li je URL /Home/AutoIzracunajPlacu dostupan.\n' +
+                              'Pogledajte konzolu za detalje (F12 → Console)');
+                    },
+                    complete: function () {
+                        // Vrati gumb u početno stanje
+                        $('#autoIzracunBtn').html('<i class="fas fa-calculator"></i> Automatski izračunaj');
+                        $('#autoIzracunBtn').prop('disabled', false);
+                    }
+                });
+            }
+
+            
+        });
+    </script>
+}
