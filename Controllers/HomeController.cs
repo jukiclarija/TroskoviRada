@@ -135,25 +135,19 @@ namespace TroskoviRada.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> IzbrisiZaposlenika(int id, IFormCollection collection) {
-            var zaposlenik = await _context.Zaposlenici
-                .Include(z => z.Zaposlenja)
-                .Include(z => z.Prisustva)
-                .Include(z => z.Odsustva)
-                .Include(z => z.Obračuni)
-                .FirstOrDefaultAsync(z => z.IdZaposlenik == id);
+            try {
+                var zaposlenik = await _context.Zaposlenici.FindAsync(id);
 
-            if (zaposlenik != null) {
-                if (zaposlenik.Zaposlenja.Any() || zaposlenik.Prisustva.Any() ||
-                    zaposlenik.Odsustva.Any() || zaposlenik.Obračuni.Any()) {
-                    TempData["ErrorMessage"] = "Ne možete izbrisati zaposlenika koji ima povezane podatke!";
-                    return RedirectToAction(nameof(IzbrisiZaposlenika), new { id });
+                if (zaposlenik != null) {
+                    _context.Zaposlenici.Remove(zaposlenik);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Zaposlenik uspješno izbrisan sa svim povezanim podacima!";
                 }
-
-                _context.Zaposlenici.Remove(zaposlenik);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Zaposlenik uspješno izbrisan!";
+                return RedirectToAction(nameof(Zaposlenici));
+            } catch (Exception ex) {
+                TempData["ErrorMessage"] = $"Greška pri brisanju zaposlenika: {ex.Message}";
+                return RedirectToAction(nameof(IzbrisiZaposlenika), new { id });
             }
-            return RedirectToAction(nameof(Zaposlenici));
         }
 
         // ZAPOSLENJE - DODAJ RADNO MJESTO ZAPOSLENIKU
