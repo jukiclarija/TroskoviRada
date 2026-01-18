@@ -32,10 +32,10 @@ if "%choice%"=="1" (
 ) else if "%choice%"=="4" (
     echo.
     echo Povezivanje na GitHub repository...
-    echo Git Repository: https://github.com/[VAŠ_USERNAME]/TroskoviRada
+    echo Git Repository: https://github.com/jukiclarija/TroskoviRada
     echo.
     echo Za kloniranje pokrenite:
-    echo git clone https://github.com/[VAŠ_USERNAME]/TroskoviRada.git
+    echo git clone https://github.com/jukiclarija/TroskoviRada.git
     pause
 ) else (
     echo Nepoznata opcija!
